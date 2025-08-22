@@ -1,0 +1,1 @@
+# src/crypto_stat_arb/__init__.py

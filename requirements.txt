@@ -1,0 +1,8 @@
+ccxt
+numpy
+pandas
+scipy
+statsmodels
+matplotlib
+tqdm
+pyyaml
