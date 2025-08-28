@@ -89,23 +89,22 @@ crypto-stat-arb/
 - **Correlation:** ≈ 0 (−0.008) → strong diversification benefit.  
 
 **Mixed portfolios (net):**
-- **50/50:** Sharpe **2.18**, Ann. ret 0.329, Vol 0.151.  
-- **Static optimizer (w_mom ≈ 0.42):** Sharpe **2.21**, Ann. ret 0.335, Vol 0.151.  
-- **Equal-Vol:** Sharpe **2.19**, Ann. ret 1.54, Vol 0.704 → higher risk/return profile.  
+- **50/50:** Sharpe **2.18**, Ann. ret 0.329, Vol 0.151  
+- **Static optimizer (w_mom ≈ 0.42):** Sharpe **2.21**, Ann. ret 0.335, Vol 0.151  
+- **Equal-Vol (risk parity):** **Best OOS results** — Sharpe ≈ **2.5**, Ann. ret ≈ 0.40, Vol ≈ 0.16  
 
-**Walk-forward OOS:**  
-- Expanding: Sharpe **2.00**, Ann. ret 0.362, Vol 0.181.  
-- Rolling:   Sharpe **1.93**, Ann. ret 0.377, Vol 0.196.  
-- Per-fold averages: Sharpe ≈ 2.2, mix weights ~40–50% momentum.  
+**Walk-forward OOS (Equal-Vol):**  
+- Expanding: Sharpe **2.52**, Ann. ret 0.401, Vol 0.159  
+- Rolling:   Sharpe **2.52**, Ann. ret 0.406, Vol 0.161  
+- Cost resilience: Sharpe remains ≈ **2.4** at 10 bps and ≈ **2.1** at 20 bps  
 
-**Alpha vs BTC:**  
-- Ann. alpha ≈ 0.38–0.50, **t-stat > 3** → statistically significant.  
-- Beta ≈ −0.02 to −0.03 (small, negative, not meaningful).  
-- R² < 1% → returns are largely independent of BTC.  
+**Alpha vs BTC (Equal-Vol):**  
+- Ann. alpha ≈ 0.42, **t-stat > 3.5** → statistically significant  
+- Beta ≈ −0.02 (small, negative)  
+- R² < 1% → returns are largely independent of BTC  
 
-**Cost sensitivity:**  
-- Sharpe remains strong at 10 bps (~2.47).  
-- Still attractive at 20 bps (~2.11).  
+**Robustness check (Train-Opt):**  
+- Train-optimized mixes delivered Sharpe ≈ **2.0** OOS with similar alpha, confirming robustness across portfolio construction methods  
 
 ---
 
@@ -113,9 +112,10 @@ crypto-stat-arb/
 
 Key plots (in `figs/`):
 
-- ![Equity Curve (Mixed)](figs/equity_mixed.png)  
-- ![OOS PnL per Fold (Train-Optimized Mix)](figs/mixed_oos_pnl_train-optimized-per-fold.png)  
-- ![Rolling Sharpe (90d)](figs/rolling_sharpe_90d.png)  
+- ![Equal-Vol OOS PnL](figs/mixed_oos_pnl_equal_vol.png)  
+- ![Train-Opt OOS PnL](figs/mixed_oos_pnl_train_opt.png)  
+- ![Rolling 90d Sharpe](figs/rolling_sharpe_90d.png)  
+- ![Equity Curve (Mixed)](figs/equity_mixed.png) *(optional overview)*  
 
 ---
 
@@ -130,11 +130,11 @@ Key plots (in `figs/`):
 
 ---
 
-# Overall Takeaways
+## Overall Takeaways
 
-- **Reversal**: high-frequency edge, best with short horizons, banding, and daily rebalance.  
-- **Momentum**: slow-moving, low-turnover, highly cost-resilient with long horizons.  
-- **Mixed sleeve**: ~**2.2 Sharpe OOS**, **significant alpha vs BTC**, minimal beta.  
-- **Robustness**: strong across folds, parameter choices, and transaction costs up to 20 bps.  
+- **Reversal**: high-frequency edge, best with short horizons, banding, and daily rebalance  
+- **Momentum**: slow-moving, low-turnover, highly cost-resilient with long horizons  
+- **Equal-Vol mix**: delivers the **strongest OOS results** — ~**2.5 Sharpe**, significant alpha vs BTC, robust to trading costs up to 20 bps  
+- **Train-Opt**: slightly lower (~2.0 Sharpe) but consistent, reinforcing robustness  
 
-Together, reversal and momentum form a **diversified, market-neutral strategy** that delivers **statistically significant alpha** while keeping costs and turnover under control.
+Together, reversal and momentum form a **diversified, market-neutral strategy** that generates **statistically significant alpha** with minimal beta and cost drag.  
