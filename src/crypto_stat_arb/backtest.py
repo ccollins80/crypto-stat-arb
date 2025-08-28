@@ -9,7 +9,7 @@ SRC = HERE.parents[1]
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from crypto_stat_arb.config import ANNUALIZATION
+from crypto_stat_arb.config import ANNUALIZATION # type: ignore
 
 def backtest(w: pd.DataFrame, R: pd.DataFrame, cost_rate: float):
     """

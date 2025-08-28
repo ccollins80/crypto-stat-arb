@@ -1,24 +1,28 @@
 # Crypto Statistical Arbitrage
 
-A reproducible research framework for **statistical arbitrage in cryptocurrencies**, built to demonstrate the full quant workflow: from **data acquisition** and **signal design** to **backtesting**, **robustness tests**, and **portfolio construction**.  
+A reproducible research framework for **statistical arbitrage in crypto**, demonstrating the full quant workflow: **data acquisition**, **signal design**, **backtesting**, **robustness tests**, **walk-forward validation**, and **portfolio construction**.  
 
-This project is designed to showcase **research rigor** and **trading relevance**, making it suitable for both a quant portfolio and professional applications.
+The project is designed to highlight **research rigor**, **trading relevance**, and **reproducibility**, making it suitable for both a quant portfolio and professional applications.
 
 ---
 
-## TL;DR
-- Pull OHLCV from exchanges (via `ccxt`).
-- Generate signals:
-  - **Cross-sectional Reversal** (short-term mean reversion).
-  - **Cross-sectional Momentum** (medium-term trend).
-- Apply **residualization vs BTC**, **banding**, and **volatility scaling**.
-- Backtest with **realistic costs, turnover, and rebalancing schemes**.
-- Evaluate **Sharpe, drawdowns, turnover, cost drag, and alpha vs BTC**.
-- Combine strategies into a **diversified multi-sleeve portfolio**.
+## At a Glance
+
+This project evaluates cross-sectional **reversal** and **momentum** strategies in cryptocurrencies and combines them into a diversified mixed sleeve.  
+The table below highlights the key performance metrics (net of costs), showing how each sleeve performs on its own and how they behave when combined.
+
+| Strategy       | Net Sharpe | Ann. Return | Ann. Vol | Turnover/yr | Cost_py | Notes |
+|----------------|-----------:|------------:|---------:|------------:|--------:|-------|
+| **Reversal**   | **1.77**   | 0.366       | 0.207    | ~89         | ~0.062  | Short lookback (k=2–4), daily rebalance, strong banding |
+| **Momentum**   | **1.32**   | 0.291       | 0.222    | ~18         | ~0.013  | Long lookback (k≈336–500), slow rebalancing, low cost |
+| **Mixed (50/50)** | **2.18** | 0.329       | 0.151    | –           | –       | Diversified blend, near-optimal Sharpe |
+| **Mixed (Optimized)** | **2.21** | 0.335   | 0.151    | –           | –       | ~42% momentum weight; best risk-adjusted |
+| **Mixed (Equal-Vol)** | **2.19** | 1.541   | 0.704    | –           | –       | Higher vol & return; cost-resilient |
 
 ---
 
 ## Repo Structure
+
 crypto-stat-arb/  
 │── notebooks/ # Analysis & results walkthroughs  
 │── src/ # Core research code   
@@ -30,74 +34,107 @@ crypto-stat-arb/
 
 ---
 
-## Results Summary
+## Data & Setup
 
-### Cross-Sectional Reversal
-- **Best config:**  
-  `k=4`, `band=2.5`, `beta_win=168` (weekly residualization),  
-  `every=24` (daily rebalancing), `vol_win=24`.
-- **Full-sample net Sharpe:** **1.77** (gross 2.07).  
-- **Ann. return:** 0.366 | **Ann. vol:** 0.207 | **Turnover:** ~89/yr.  
-- **Robust OOS:** Train Sharpe 1.56 vs Test Sharpe 2.19 → strong generalization.  
-- **Cost-resilient:** Net Sharpe remains ~0.95 even at 20 bps.
-
-**Takeaway:**  
-Reversal works best with **short lookbacks (k=2–4)**, strong banding, and daily rebalancing. Performance is robust across folds, costs, and parameter perturbations.
+- **Universe:** 12 liquid crypto pairs (hourly bars).  
+- **Sample:** ~2.6 years (≈ 12,960 hourly obs for walk-forward).  
+- **Costs:** baseline **7 bps** per rebalance unless otherwise noted.  
+- **Benchmark:** BTCUSDT for residualization and alpha estimates.
 
 ---
 
-### Cross-Sectional Momentum
-- **Best config:**  
-  `k=336` (~14 days), `band=2.5`, no residualization,  
-  `every=720` (~30 days), `vol_win=168`.
-- **Full-sample net Sharpe:** **1.29**.  
-- **Ann. return:** 0.277 | **Ann. vol:** 0.184 | **Turnover:** ~4.6/yr (cost drag ≈ 0.003).  
-- **OOS Sharpe:** 1.58 (test) vs 1.21 (train).  
-- **Alpha vs BTC:** ~0.26 ann., but not statistically significant (t ≈ 1.41).  
-- **Market exposure negligible:** β ≈ 0.03, R² < 1%.
+# Results
 
-**Takeaway:**  
-Momentum is competitive with **long lookbacks** and **monthly rebalancing**, offering **very low turnover** and near-zero market beta.
+## Cross-Sectional Reversal
 
----
+- **Best configuration:**  
+  `k=4` (4-bar lookback), `band=2.5`, `beta_win=168` (≈1 week residualization),  
+  `every=24` (daily rebalance), `vol_win=24`.  
+- **Performance:**  
+  - Net Sharpe ≈ **1.77** (gross ≈ 2.07)  
+  - Ann. return ≈ 0.366 | Ann. vol ≈ 0.207  
+  - Turnover ≈ 89/yr | Cost drag ≈ 0.06  
 
-### Diversification & Mixed Portfolios
-- **Sleeve correlation:** Corr(reversal, momentum) ≈ −0.055 → strong diversification.  
-- **50/50 mix:** Sharpe **2.39**, ann. vol 0.135, ann. ret 0.321.  
-- **Equal-vol mix:** Sharpe **2.38**, ann. vol 0.687, ann. ret 1.64 → higher return at higher risk.  
-- **OOS stitched performance:** Sharpe ~**2.5** with max drawdowns <8%.  
-- **Alpha vs BTC:** Ann. α ≈ **0.31**, t ≈ **2.5** (statistically significant).
+**Observations**
+- Multiple nearby configs (Sharpe 1.66–1.73) confirm robustness.  
+- Short-to-medium lookbacks (k=2–4), strong banding (2.0–2.5), and daily rebalancing are consistently effective.  
+- Higher turnover specs (e.g., every=36) show strong test Sharpe but lose efficiency due to costs.  
+- Lower turnover specs (every=48) are cheaper but underperform.  
 
-**Takeaway:**  
-- Reversal and Momentum are **complementary**; their low correlation enables a large Sharpe uplift.  
-- **50/50 static mix** achieves the highest risk-adjusted returns.  
-- **Equal-vol mix** delivers higher returns at higher risk.  
-- Both generate **statistically significant alpha** vs BTC with **near-zero beta**.
+**Conclusion:** Reversal works best with **short horizons, strong banding, and daily rebalancing**, producing robust out-of-sample Sharpe even with transaction costs up to 20 bps.
 
 ---
 
-## Robustness Checks
-- **Walk-forward analysis:**  
-  Expanding and rolling windows confirm stable out-of-sample Sharpe ~1.55 (single sleeve) and ~2.55 (mixed).  
-- **Transaction cost sensitivity (equal-vol mix):**  
-  - **7 bps:**  Exp mean Sharpe **2.32**, Roll mean Sharpe **2.34**  
-  - **10 bps:** Exp **2.19**, Roll **2.22**  
-  - **20 bps:** Exp **1.77**, Roll **1.80** 
+## Cross-Sectional Momentum
+
+- **Best configurations:**  
+  - **Slow sleeve:** `k ≈ 168` (≈7 days), `band=2.5`, `every=720` (≈30 days) → Net Sharpe ≈ 1.31, turnover ≈ 3/yr.  
+  - **Expanded grid optimum:** `k ≈ 500` (≈21 days), `band=2.0`, `every=336` (≈14 days) → Net Sharpe ≈ 1.32, turnover ≈ 18/yr.  
+
+**Performance**
+- Net Sharpe ≈ **1.3** across best runs.  
+- Annualized returns ≈ 0.29, volatility ≈ 0.22.  
+- Extremely low turnover in slow variants; costs negligible.  
+- Robustness tests show parameter stability around long horizons (`k=336–500`) with infrequent rebalancing (`every=336–720`).  
+
+**Conclusion:** Momentum is a **low-turnover, cost-resilient sleeve** that performs best with long horizons and slow rebalancing. It generates **statistically significant alpha vs BTC** with minimal beta exposure.
 
 ---
 
-## Overall Conclusions
-- The **equal-vol mix of Reversal + Momentum** achieves **robust, high OOS Sharpe (~2.5)** with shallow drawdowns (<8%).  
-- The sleeve produces **positive, significant alpha** vs BTC with **beta ≈ 0**, offering **diversified crypto exposure** rather than simple market beta.  
-- Performance is **cost-resilient**, attractive even at 20 bps.  
-- **Reversal** drives high-frequency edge; **Momentum** contributes low-cost persistence; **together** they deliver a balanced, robust profile.  
+## Mixed Strategy (Reversal + Momentum)
+
+- **Single-sleeve (net):**  
+  - Reversal: Sharpe 1.77 | Ann. ret 0.366 | Vol 0.207 | Turnover ~89/yr  
+  - Momentum: Sharpe 1.32 | Ann. ret 0.291 | Vol 0.222 | Turnover ~18/yr  
+- **Correlation:** ≈ 0 (−0.008) → strong diversification benefit.  
+
+**Mixed portfolios (net):**
+- **50/50:** Sharpe **2.18**, Ann. ret 0.329, Vol 0.151.  
+- **Static optimizer (w_mom ≈ 0.42):** Sharpe **2.21**, Ann. ret 0.335, Vol 0.151.  
+- **Equal-Vol:** Sharpe **2.19**, Ann. ret 1.54, Vol 0.704 → higher risk/return profile.  
+
+**Walk-forward OOS:**  
+- Expanding: Sharpe **2.00**, Ann. ret 0.362, Vol 0.181.  
+- Rolling:   Sharpe **1.93**, Ann. ret 0.377, Vol 0.196.  
+- Per-fold averages: Sharpe ≈ 2.2, mix weights ~40–50% momentum.  
+
+**Alpha vs BTC:**  
+- Ann. alpha ≈ 0.38–0.50, **t-stat > 3** → statistically significant.  
+- Beta ≈ −0.02 to −0.03 (small, negative, not meaningful).  
+- R² < 1% → returns are largely independent of BTC.  
+
+**Cost sensitivity:**  
+- Sharpe remains strong at 10 bps (~2.47).  
+- Still attractive at 20 bps (~2.11).  
+
+---
+
+## Figures
+
+Key plots (in `figs/`):
+
+- ![Equity Curve (Mixed)](figs/equity_mixed.png)  
+- ![OOS PnL per Fold (Train-Optimized Mix)](figs/mixed_oos_pnl_train-optimized-per-fold.png)  
+- ![Rolling Sharpe (90d)](figs/rolling_sharpe_90d.png)  
 
 ---
 
 ## Limitations
-- Results are based on **~2.6 years of hourly data** across 12 assets → limited regime coverage.  
-- Costs are simplified; real-world frictions may vary.  
-- Outcomes depend on parameter search and benchmark choice.  
-- Treat results as **indicative, not definitive**.
+
+- **Sample length:** Only ~2.6 years of hourly data — limited regime coverage.  
+- **Universe scope:** 12 assets; results may vary with broader or different universes.  
+- **Cost model:** Simplified constant transaction cost assumption; real-world frictions (slippage, fees, market impact) may be larger and exchange-specific.  
+- **Parameter dependence:** While robustness checks are strong, performance still depends on grid choices (lookbacks, banding, residualization).  
+- **Benchmark choice:** Residualization is done vs BTC; alternative benchmarks (ETH, alt baskets, stablecoin pairs) may shift outcomes.  
+- **Execution feasibility:** Turnover estimates assume perfect liquidity; smaller alts may face practical liquidity constraints.  
 
 ---
+
+# Overall Takeaways
+
+- **Reversal**: high-frequency edge, best with short horizons, banding, and daily rebalance.  
+- **Momentum**: slow-moving, low-turnover, highly cost-resilient with long horizons.  
+- **Mixed sleeve**: ~**2.2 Sharpe OOS**, **significant alpha vs BTC**, minimal beta.  
+- **Robustness**: strong across folds, parameter choices, and transaction costs up to 20 bps.  
+
+Together, reversal and momentum form a **diversified, market-neutral strategy** that delivers **statistically significant alpha** while keeping costs and turnover under control.

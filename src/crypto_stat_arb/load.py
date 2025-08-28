@@ -26,3 +26,4 @@ def load_panels(data_dir: Path, px_name="px_1h.csv", ret_name="ret_1h.csv"):
     ret = ret.loc[:, common]
 
     return px, ret
+ # type: ignore

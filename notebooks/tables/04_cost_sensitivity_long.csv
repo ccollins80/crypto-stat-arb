@@ -1,0 +1,7 @@
+series,cost_bps,sharpe,ann_return,ann_vol
+Mix 50/50,7,2.418506,,0.1353
+Mix 50/50,10,2.316227,,0.135309
+Mix 50/50,20,1.973697,,0.135457
+Mix Equal-Vol,7,2.412817,,0.691443
+Mix Equal-Vol,10,2.315743,,0.691484
+Mix Equal-Vol,20,1.990699,,0.692162

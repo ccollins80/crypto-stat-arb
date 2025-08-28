@@ -9,7 +9,7 @@ SRC = HERE.parents[1]          # this is .../src
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from crypto_stat_arb.config import BENCH_DEFAULT
+from crypto_stat_arb.config import BENCH_DEFAULT # type: ignore
 
 # ----------------- helpers -----------------
 
@@ -80,14 +80,15 @@ def cs_momentum_weights(
 ) -> pd.DataFrame:
     """
     Cross-sectional momentum (trend over k bars).
-    - signal = + rolling k-bar cumulative return
+    - signal = rolling k-bar cumulative return of residualized returns, but on X.shift(1)
     - z-score across assets
     - hard band: zero weights where |z| < band
     - optional inverse-vol scaling
     - L1-normalize & neutralize each bar
     """
     X = residualize_to_bench(R, bench, beta_win)
-    mom = X.rolling(k, min_periods=k).sum()
+    X_lag = X.shift(24)
+    mom = X_lag.rolling(k, min_periods=k).sum()
     sig = mom
     z = _zscore_xs(sig)
     if band and band > 0:

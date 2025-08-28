@@ -10,7 +10,7 @@ SRC = HERE.parents[1]
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from crypto_stat_arb.config import ANNUALIZATION
+from crypto_stat_arb.config import ANNUALIZATION # type: ignore
 
 def perf_summary_from_series(r: pd.Series, label: str, freq_per_year=ANNUALIZATION):
     """
@@ -48,20 +48,26 @@ def compute_alpha_beta(strategy_ret: pd.Series, bench_ret: pd.Series, freq=ANNUA
         "n_obs":     int(model.nobs),
     }
 
-def nw_mean_tstat(r: pd.Series, lag_bars: int = 24, freq=ANNUALIZATION):
+def nw_mean_tstat(r, lag_bars: int = 24, freq=ANNUALIZATION):
     """
     Newey–West t-stat for the mean of r (per-bar arithmetic returns).
     Returns (mean_per_bar, t_stat, ann_mean).
+    Accepts pd.Series, np.ndarray, or list.
     """
-    r = r.dropna()
-    if len(r) == 0:
+    # Coerce to Series so .dropna() works
+    r = pd.Series(r, dtype=float).dropna()
+    if r.empty:
         return np.nan, np.nan, np.nan
 
-    X = np.ones((len(r), 1))
-    model = sm.OLS(r.values, X).fit(cov_type="HAC", cov_kwds={"maxlags": int(lag_bars)})
+    # Cap HAC lags to a sensible value
+    maxlags = int(min(lag_bars, max(1, len(r)//2)))
+
+    X = np.ones((len(r), 1))  # intercept-only regression
+    model = sm.OLS(r.values, X).fit(cov_type="HAC", cov_kwds={"maxlags": maxlags})
+
     mean_per_bar = float(model.params[0])
-    t_stat = float(model.tvalues[0])
-    ann_mean = mean_per_bar * freq
+    t_stat       = float(model.tvalues[0])
+    ann_mean     = mean_per_bar * freq
     return mean_per_bar, t_stat, ann_mean
 
 
