@@ -8,16 +8,16 @@ The project is designed to highlight **research rigor**, **trading relevance**, 
 
 ## At a Glance
 
-This project evaluates cross-sectional **reversal** and **momentum** strategies in cryptocurrencies and combines them into a diversified mixed sleeve.  
+This project evaluates cross-sectional **reversal** and **momentum** strategies in cryptocurrencies and combines them into diversified mixed sleeves.  
 The table below highlights the key performance metrics (net of costs), showing how each sleeve performs on its own and how they behave when combined.
 
-| Strategy       | Net Sharpe | Ann. Return | Ann. Vol | Turnover/yr | Cost_py | Notes |
-|----------------|-----------:|------------:|---------:|------------:|--------:|-------|
-| **Reversal**   | **1.77**   | 0.366       | 0.207    | ~89         | ~0.062  | Short lookback (k=2–4), daily rebalance, strong banding |
-| **Momentum**   | **1.32**   | 0.291       | 0.222    | ~18         | ~0.013  | Long lookback (k≈336–500), slow rebalancing, low cost |
-| **Mixed (50/50)** | **2.18** | 0.329       | 0.151    | –           | –       | Diversified blend, near-optimal Sharpe |
-| **Mixed (Optimized)** | **2.21** | 0.335   | 0.151    | –           | –       | ~42% momentum weight; best risk-adjusted |
-| **Mixed (Equal-Vol)** | **2.19** | 1.541   | 0.704    | –           | –       | Higher vol & return; cost-resilient |
+| Strategy              | Net Sharpe | Ann. Return | Ann. Vol | Turnover/yr | Cost_py | Notes |
+|-----------------------|-----------:|------------:|---------:|------------:|--------:|-------|
+| **Reversal**          | **1.77**   | 0.366       | 0.207    | ~89         | ~0.062  | Short lookback (k=2–4), daily rebalance, strong banding |
+| **Momentum**          | **1.32**   | 0.291       | 0.222    | ~18         | ~0.013  | Long lookback (k≈336–500), slow rebalancing, low cost |
+| **Mixed (50/50)**     | **2.18**   | 0.329       | 0.151    | –           | –       | Simple diversified blend |
+| **Mixed (Static Opt.)** | **2.21** | 0.335       | 0.151    | –           | –       | ~42% momentum weight; best in-sample risk-adjusted |
+| **Mixed (Equal-Vol)** | **2.52**   | 0.401       | 0.159    | –           | –       | **Best OOS performer**; cost-resilient (Sharpe ≈ 2.1 at 20bps) |
 
 ---
 
