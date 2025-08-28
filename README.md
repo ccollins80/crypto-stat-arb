@@ -122,7 +122,7 @@ Key plots (in `figs/`):
 ## Limitations
 
 - **Sample length:** Only ~2.6 years of hourly data — limited regime coverage.  
-- **Universe scope:** 12 assets; results may vary with broader or different universes.  
+- **Universe scope:** 12 assets; current results based on 12 liquid pairs; expanding to 20–30+ assets could further improve robustness and cross-sectional signal strength.    
 - **Cost model:** Simplified constant transaction cost assumption; real-world frictions (slippage, fees, market impact) may be larger and exchange-specific.  
 - **Parameter dependence:** While robustness checks are strong, performance still depends on grid choices (lookbacks, banding, residualization).  
 - **Benchmark choice:** Residualization is done vs BTC; alternative benchmarks (ETH, alt baskets, stablecoin pairs) may shift outcomes.  
